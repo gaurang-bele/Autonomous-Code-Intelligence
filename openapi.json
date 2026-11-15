@@ -1,0 +1,107 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Autonomous Code Review & Refactoring Agent",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000"
+    }
+  ],
+  "paths": {
+    "/api/webhooks/github": {
+      "post": {
+        "summary": "Ingest GitHub PR webhook",
+        "responses": {
+          "202": {
+            "description": "Review started and paused for approval"
+          },
+          "422": {
+            "description": "Invalid webhook payload"
+          }
+        }
+      }
+    },
+    "/api/reviews/{thread_id}/approve": {
+      "post": {
+        "summary": "Approve or reject refactor",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "approved"
+                ],
+                "properties": {
+                  "approved": {
+                    "type": "boolean"
+                  },
+                  "feedback": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Review resumed"
+          },
+          "404": {
+            "description": "Thread not found"
+          },
+          "422": {
+            "description": "Invalid decision"
+          }
+        }
+      }
+    },
+    "/api/reviews/{thread_id}": {
+      "get": {
+        "summary": "Get review state",
+        "parameters": [
+          {
+            "name": "thread_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Review state"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Healthy"
+          }
+        }
+      }
+    }
+  }
+}
